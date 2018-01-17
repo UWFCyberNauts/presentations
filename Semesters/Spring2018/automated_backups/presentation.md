@@ -1,14 +1,13 @@
 ### Automating backups with SystemD and Crontab
 
-This presentation consists of writing a backup script, then using SystemD and Crontab to automate it.  
+This presentation consists of writing a backup script and understanding how it works.  
 The relevant help pages for this presentation are:
-* crontab(5) man page. Notably the section on time and date fields
-* systemd.unit(5) man page. Notably the '[UNIT] SECTION OPTIONS' section
-* systemd.timer(5) man page. Notably the 'OPTIONS' section
+* bash(1) man page. Notably the section on time and date fields
+* getopts(1) man page. Notably the example section
+* tar(1) man page. Notably the option syles secion
+* find(1) man page. Notably printf in the actions section and -type in the tests section
 
-the relevant code, crontab, and SystemD unit files can be found in this presentation directory.
+the relevant code can be found in this presentation directory.
 
-This presentation is not finished yet ;-;  
-check back later :D 
 
 __Author: Michael Mitchell__
