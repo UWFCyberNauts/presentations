@@ -1,4 +1,4 @@
-### Automating backups with SystemD and Crontab
+### Custom backups
 
 This presentation consists of writing a backup script and understanding how it works.  
 The relevant help pages for this presentation are:
