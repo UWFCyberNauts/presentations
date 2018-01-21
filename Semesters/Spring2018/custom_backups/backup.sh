@@ -3,17 +3,20 @@
 ## Author: Michael Mitchell
 version=1.0
 
-###*** Functions ***###
+###*** FUNCTIONS ***###
 
 ## Function to cleanup leftover files.
-function cleanup { rm -rf $backupName.tgz timestamp.txt /tmp/newTimes.txt &>/dev/null ; }
+function cleanup { rm -rf $backupName.tgz timestamp.txt /tmp/newTimes.txt &>/dev/null; }
 
 ## Function to do the actual backups.
 function backup {
     ## Change to the directory where we will store the backup file
     cd $storageDir
     ## Create the backup of the contents
-    tar -czf $backupName.tgz $backupDir 2>/dev/null 1>/dev/null || { echo "Failed to backup $backupDir!" ; exit 1 ; }
+    tar -czf $backupName.tgz $backupDir 2>/dev/null 1>/dev/null || { 
+        echo "Failed to backup $backupDir!"
+        exit 1
+    }
     ## Create a timestamp log for the backup we just made.
     cat /tmp/newTimes.txt > timestamp.txt
     ## Archive the backup and the timestamp log together.
@@ -40,7 +43,7 @@ storageDir=NULL ## Directory to store the backup in
 backupDir=NULL  ## Directory to backup
 
 ## Use getopts to parse the command line options
-while getopts :hb:s: opt ; do
+while getopts :hb:s: opt; do
     case $opt in
         b) ## Found backup flag
             backupDir=$OPTARG ## Assign the backup flags arg to backupDir
@@ -96,22 +99,30 @@ esac
 ## Determine the name for the backup file from the directory being backed up
 backupName=$(basename $backupDir) ## The name to name the backup file
 
-## Get the timestamp data of the directory to backup and its subdirectories so we can compare
-## them to any previous backups or for creating a fresh backup.
-find $backupDir -type d -printf '%f %c\n' > /tmp/newTimes.txt 2>&1 || { echo "Failed to find $backupDir!" ; exit 1; }
+## Get the timestamp data of the directory to backup and its 
+## subdirectories so we can compare them to any previous backups 
+## or for creating a fresh backup.
+find $backupDir -type d -printf '%f %c\n' > /tmp/newTimes.txt 2>&1 || { 
+    echo "Failed to find $backupDir!"
+    exit 1
+}
 
 ## Decision logic to perform a backup.
 
 ## Move to where a previous backup could be stored. 
-cd $storageDir &>/dev/null || { echo "Failed to find $storageDir!" ; exit 1; }
+cd $storageDir &>/dev/null || { 
+    echo "Failed to find $storageDir!"
+    exit 1
+}
 
 if [[ -f $backupName.tar ]]; then ## a previous backup exists
-    ## Compare timestamps of the potential directory to backup with the previous backups timestamp log.
+    ## Compare timestamps of the directory to backup with the previous backups timestamp log.
     tar -xf $backupName.tar ## Extract the archive where the backups timestamp log is stored.
 
-    ## Compare timestamp logs of the potential directory to backup with the previous backups timestamp log.
+    ## Compare timestamp logs of the directory to backup with the previous backups timestamp log.
     if [[ $(cat /tmp/newTimes.txt) != $(cat timestamp.txt) ]]; then
-        ## Time stamp log on backup does not match our new time stamp log (which means something has changed)
+        ## Time stamp log on backup does not match our 
+        ## generated time stamp log (which means something has changed)
         ## so we should create a backup of those changes.
         backup
     else 
