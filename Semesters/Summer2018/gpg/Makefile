@@ -1,10 +1,12 @@
 DEPS = gpg.md
 
-all: clean build
+all: build
 
-build: clean
-	mkdir build/
-	pandoc -o build/gpg.pdf --from markdown --pdf-engine=xelatex --highlight-style=breezeDark gpg.md
+init: 
+	mkdir -p build/
+
+build: init clean
+	pandoc -o build/gpg.pdf --from markdown --template=lib/template.tex --pdf-engine=xelatex --highlight-style=breezeDark src/md/gpg.md
 
 clean: 
-	rm -rf build/
+	rm -rf build/*
