@@ -1,0 +1,50 @@
+#!/usr/bin/env python3.6
+
+# This is a small python script that runs a command when detecting a file
+# has changed. My use case is to use it to compile a pandoc markdown into
+# a pdf for me.
+
+##** Config **##
+sources_root = "src/"
+build_command = "pandoc -o build/gpg.pdf --from markdown --template=lib/template.tex --pdf-engine=xelatex --highlight-style=breezeDark src/md/gpg.md"
+
+##** Program **##
+from os import walk
+from os.path import join, getmtime
+from time import ctime, sleep
+from sys import exit
+import subprocess
+
+##** Functions **##
+def build(command):
+    print("Executing Build...\n")
+    stdout = subprocess.run(command, stdout=subprocess.PIPE)
+    print(stdout.stdout.decode("UTF-8")) ## Has an embedded newline \o/
+    if stdout.returncode != 0:
+        print("Build Failed!")
+        exit(stdout.returncode)
+    else :
+        print("Build Finished!\n")
+
+##** Main **##
+build(build_command.split()) # Build 
+
+files = dict() # dictionary of files and modified times.
+
+# Generate the last modified times.
+fileGett = walk(sources_root)
+for dirpath, dirnames, filenames in fileGett:
+    for fileName in filenames:
+        fileNameAndPath = join(dirpath, fileName)
+        files[fileNameAndPath] = ctime(getmtime(fileNameAndPath))
+
+# Run loop to continually check if any of the files have been changed.
+while True:
+    for fileNameAndPath in files.keys():
+        if not (files[fileNameAndPath] == ctime(getmtime(fileNameAndPath))):
+            build(build_command.split())
+            files[fileNameAndPath] = ctime(getmtime(fileNameAndPath))
+
+    sleep(1)
+        
+##** End Main **##

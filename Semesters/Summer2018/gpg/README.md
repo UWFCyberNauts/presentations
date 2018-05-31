@@ -4,6 +4,11 @@ To build the paper (written in PandocMarkdown) run
 
 ```make```
 
-Depends:
+##### If I find the time to figure out what these deps are for DEB and RPM based systems I'll put that here 
+Arch Depends:
+
 * pandoc
-* latex-full (everything latex)
+
+* texlive-most 
+
+* texlive-lang 
