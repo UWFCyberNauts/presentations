@@ -228,4 +228,3 @@ To trust this key you have selected to edit, type ```trust```. You will then be 
 ![Trust Menu for a key in GPG](src/img/trustMenuGPG.png){#f8}
 
 From here you choose the level of trust you wish to grant this key, then type ```quit```. You will then be put back to your regular command line.
->>>>>>> Stashed changes
