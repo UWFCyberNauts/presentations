@@ -169,15 +169,6 @@ This command will allow you to fingerprint your public key using the email addre
 Alternatively, instead of using your email address to identify the key, you can use the KeyID method I identified earleir in [Section 2-3](#section2-3)
 
 Running the above command may produce output similar to _[Figure 4](#f4)_:
-<<<<<<< Updated upstream
-
-![A Fingerprint of a Public PGP key](src/img/fingerprint.png){#f4}
-
-Here the fingerprint is on the second line, the groupings of 4 characters made up of upper case letters and numbers. Use that fingerprint to verify your key with others.
-
-## 4. Importing a key {#section3-4}
-So far I have elaborated how to get the fingerprint of __your__ key. If you wan't to get the fingerprint of someone elses key to verify it with them, you first need to import their key into GPG
-=======
 
 ![A Fingerprint of a Public PGP key](src/img/fingerprint.png){#f4}
 
