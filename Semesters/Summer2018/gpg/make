@@ -5,46 +5,70 @@
 # a pdf for me.
 
 ##** Config **##
+
 sources_root = "src/"
-build_command = "pandoc -o build/gpg.pdf --from markdown --template=lib/template.tex --pdf-engine=xelatex --highlight-style=breezeDark src/md/gpg.md"
+build_command = "pandoc -o build/gpg.pdf --from markdown --pdf-engine=xelatex --highlight-style=breezeDark src/md/gpg.md"
 
 ##** Program **##
+
 from os import walk
 from os.path import join, getmtime
 from time import ctime, sleep
-from sys import exit
+from sys import exit, argv
 import subprocess
 
 ##** Functions **##
+
 def build(command):
     print("Executing Build...\n")
-    stdout = subprocess.run(command, stdout=subprocess.PIPE)
-    print(stdout.stdout.decode("UTF-8")) ## Has an embedded newline \o/
-    if stdout.returncode != 0:
-        print("Build Failed!")
-        exit(stdout.returncode)
-    else :
+    process_handler = subprocess.run(command, stdout=subprocess.PIPE)
+    stdout = process_handler.stdout.decode("UTF-8").rstrip()
+
+    print(f"{stdout}\n")
+
+    if not (process_handler.returncode == 0):
+        print("Build Failed!\n")
+        exit(process_handler.returncode)
+    else:
         print("Build Finished!\n")
 
-##** Main **##
-build(build_command.split()) # Build 
+def generateSourcesTable():
+    # Generate the last modified times.
+    files = dict()
 
-files = dict() # dictionary of files and modified times.
-
-# Generate the last modified times.
-fileGett = walk(sources_root)
-for dirpath, dirnames, filenames in fileGett:
-    for fileName in filenames:
-        fileNameAndPath = join(dirpath, fileName)
-        files[fileNameAndPath] = ctime(getmtime(fileNameAndPath))
-
-# Run loop to continually check if any of the files have been changed.
-while True:
-    for fileNameAndPath in files.keys():
-        if not (files[fileNameAndPath] == ctime(getmtime(fileNameAndPath))):
-            build(build_command.split())
+    fileGett = walk(sources_root)
+    for dirpath, dirnames, filenames in fileGett:
+        for fileName in filenames:
+            fileNameAndPath = join(dirpath, fileName)
             files[fileNameAndPath] = ctime(getmtime(fileNameAndPath))
 
-    sleep(1)
-        
+    return files
+
+##** Main **##
+
+continuous = False
+
+if len(argv) == 2:
+    if argv[1] == '-c':
+        continuous = True
+    else:
+        print("Usage:\n\t%s [-c]\n\t\tWhere -c will continuously build on the script\n\t\tdetecting a file has changed" % argv[0])
+        print("\n\tYou can configure where the script looks for file changes by\n\topening the script and changing the sources_root value")
+        exit(0)
+
+build_command = build_command.split()
+build(build_command) # Build 
+
+# Run loop to continually check if any of the files have been changed.
+if continuous:
+    files = generateSourcesTable() # dictionary of files and modified times.
+
+    while True:
+        sleep(1)
+
+        newFiles = generateSourcesTable() 
+        if not (files == newFiles):
+            build(build_command) # Build 
+            files = newFiles
+
 ##** End Main **##

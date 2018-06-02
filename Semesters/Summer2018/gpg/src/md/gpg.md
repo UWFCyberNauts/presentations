@@ -38,7 +38,7 @@ In this section we will cover how to create a PGP key pair using good secure def
 
 ## 1. Your First Keypair {#section2-1}
 
-``` { .bash .numberLines startFrom="1" }
+``` { #e1 .bash .numberLines startFrom="1" }
 $: gpg --full-generate-key
 ```
 
@@ -58,7 +58,7 @@ Creating your Public/ Private key pair is very customizable. The recommended def
 
 Now that you have create a public and private key pair, it's time to look at them.
 
-``` { .bash .numberLines startFrom="1" }
+``` { #e2 .bash .numberLines startFrom="1" }
 $: gpg --list-secret-keys youremail@domain.com
 ```
 
@@ -70,7 +70,7 @@ After running that command you should see something similar to _[Figure 1](#f1)_
 
 In _[Figure 1](#f1)_, we can see the email address that the private key belongs to, the size of the key (rsa4096), the date the private key was created, the day the private key will expire, and the trust level of the key ([ultimate]). The easiest way of finding your key is by using your email address.
 
-``` { .bash .numberLines startFrom="1" }
+``` { #e3 .bash .numberLines startFrom="1" }
 $: gpg --list-keys youremail@domain.com
 ```
 
@@ -84,7 +84,7 @@ In _[Figure 2](#f2)_ we are listing the public key that corresponds with the pri
 
 One day, you might eventually have several different PGP keys for a single email address for a multitude of reasons. Listing your PGP key by your email address might become inconvienient at that point. It then becomes necessesary to list all the keys and filter down to the one you wan't by KeyID. 
 
-``` { .bash .numberLines startFrom="1" }
+``` { #e4 .bash .numberLines startFrom="1" }
 $: gpg --list-keys --keyid-format=LONG 
 ```
 
@@ -112,11 +112,11 @@ Awesome. In this section, we have created a PGP public/ private key pair using G
 
 In this section I will cover how to export your PGP keys, how to send your public PGP key to someone, and how to verify that PGP key.
 
-## 1. Exporting Public Key {#section3-1}
+## 1. Exporting Your Public Key {#section3-1}
 
 It's cool that we can generate and display PGP keys created with GPG, but they're not really useful if we can't send them to anyone!
 
-``` { .bash .numberLines startFrom="1" }
+``` { #e5 .bash .numberLines startFrom="1" }
 $: gpg -a -o youremail@domain.com.pub.asc --export youremail@domain.com
 ```
 
@@ -142,7 +142,7 @@ export the public key denoted by the next argument
     
 The email associated with the public key you are trying to export.
 
-## 2. Sending/ Receiving a Key {#section3-2}
+## 2. Sending a Key {#section3-2}
 
 Now that we have exported our public PGP key and have readied it to be sent to people, we must actually send it to people. There is a multitude of ways to do this. How you send your key to other people is up to you and depends on how you can actually contact them.
 
@@ -154,11 +154,13 @@ Here are some available options from most secure to least secure (all of these m
 
 * Email them your key.
 
-## 3. Fingerprinting a Key {#section3-3}
+\pagebreak 
+
+# Fingerprinting a Key {#section4}
 
 When sending or receiving a PGP key you will need to know that key's fingerprint to verify with the sender/receiver that the key you received/sent is actually the correct key. Fingerprint verification should be done over a seperate secured channel, over the phone if you know what their voice sounds like, etc. If you have a web server where you can host your PGP Fingerprint or you can host the fingerprint on another service; one of those methods might be a solution over making a phone call, etc.
 
-``` { .bash .numberLines startFrom="1" }
+``` { #e6 .bash .numberLines startFrom="1" }
 $: gpg --fingerprint youremail@domain.com
 ```
 
@@ -167,6 +169,7 @@ This command will allow you to fingerprint your public key using the email addre
 Alternatively, instead of using your email address to identify the key, you can use the KeyID method I identified earleir in [Section 2-3](#section2-3)
 
 Running the above command may produce output similar to _[Figure 4](#f4)_:
+<<<<<<< Updated upstream
 
 ![A Fingerprint of a Public PGP key](src/img/fingerprint.png){#f4}
 
@@ -174,3 +177,64 @@ Here the fingerprint is on the second line, the groupings of 4 characters made u
 
 ## 4. Importing a key {#section3-4}
 So far I have elaborated how to get the fingerprint of __your__ key. If you wan't to get the fingerprint of someone elses key to verify it with them, you first need to import their key into GPG
+=======
+
+![A Fingerprint of a Public PGP key](src/img/fingerprint.png){#f4}
+
+Here the fingerprint is on the second line, the groupings of 4 characters made up of upper case letters and numbers. Use that fingerprint to verify your key with others.
+
+\pagebreak
+
+# Receiving keys! {#section5}
+
+## 1. Importing a key {#section5-1}
+
+The very first thing you need to do when receiving a PGP key is to import it into GPG so you can perform actions upon that key such as finding the fingerprint of that key. So far I have only elaborated how to get the fingerprint of __your__ key.
+
+``` { #e7 .bash .numberLines startFrom="1" }
+$: gpg --import publickey.gpg.asc
+```
+
+where publickey.gpg.asc is the public key file that someone has sent you and is the PGP public key in this example.
+
+After you import the key, you should be presented with something similar to _[Figure 5](#f5)_
+
+![Importing a PGP Public Key](src/img/importingPublicKey.png){#f5}
+
+If you were to list a key you have just imported either by the email or long key ID shown to us by GPG, you will be presented with something similar to _[Figure 6](#f6)_
+
+![Listing a Recently Imported Public Key](src/img/recentlyImportedPublicKey.png){#f6}
+
+At this stage in the process of receiving a key, you would fingerprint the key you have imported and perform a fingerprint verification process so that you can determine if the key you have received is really the key that was intended to be sent to you by the sender. Remeber, since you have imported the key into GPG, you can use the same method for fingerprinting keys described in _[Section 4](#section4)_
+
+## 2. Trusting keys {#section5-2}
+
+In _[Figure 6](#f6)_ we can see that on the third line, there is [unknown] in brackets. This represents how much you have configured GPG to trust this key. By default, GPG will configure the trust level of a recently imported key to '[unknown]'. There are different trust levels that you can assign a key within GPG. These trust levels do not affect the key itself, only other keys that are signed by that key/keypair. The trust levels and what they do are in _[Table 1](#t1)_
+
+Trust Level | Description
+--- | ---
+Ultimate | The Ultimate trust level is only intended to be used with __your own keys__
+Full | This trust level is for keys you trust to __sign other keys__. I.E. if you import a key from Bob and trust if 'Fully', then if you receive a key from Alice that is signed by Bob's key, you can technically skip fingerprint verification because Alice's key has been cryptographically signed by Bob's 'Fully' trusted key.
+Marginal | This will make any key you receive valid as long as it has been signed by three other keys. This is a fairly complex trust level that most recommend avoiding.
+Unknown / Undefined | Technically both of these trust levels are the same, Unknown is set by GPG when importing a key, Undefined is set by a user usually to represent that they will come back to verify/ change it's trust level later.
+Never | This trust level is programmatically identical to Unknown/ Undefined except that the user has actively chosen to __never__ trust the key in question. A good example of when to use this trust model would be when you import a key from someone whom you know to be siging other keys without accurately verifying those keys.
+
+Ideally, after you have verified the key's fingerprint with the sender (now that the key is imported into GPG you can use the same method outlined in _[Section 4](#section4)_ to get that keys fingerprint) you can set the trust level of that key to something appropriate.
+
+To trust a key, you will have to use the ```--edit-key``` flag with gpg.
+
+``` { #e8 .bash .numberLines startFrom="1" }
+$: gpg --edit-key youremail@domain.com
+```
+In _[Example 8](#e8)_ above, I tell GPG to edit a key by using an email address as a unique identifier. You may use a Key ID format instead of an email address to identify to GPG the key you wish to edit.
+
+After calling the command to edit a key in GPG, you will be presented with a GPG console that you can use to trust a key in GPG. The console looks like _[Figure 7](#f7)_
+
+![GPG Console to edit a PGP Key](src/img/gpgEditConsole.png){#f7}
+
+To trust this key you have selected to edit, type ```trust```. You will then be presented with something similar to _[Figure 8](#f8)_.
+
+![Trust Menu for a key in GPG](src/img/trustMenuGPG.png){#f8}
+
+From here you choose the level of trust you wish to grant this key, then type ```quit```. You will then be put back to your regular command line.
+>>>>>>> Stashed changes
