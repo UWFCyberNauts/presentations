@@ -108,7 +108,7 @@ Awesome. In this section, we have created a PGP public/ private key pair using G
 
 \pagebreak
 
-# Sending Your Keys! {#section3}
+# Sending Your Key {#section3}
 
 In this section I will cover how to export your PGP keys, how to send your public PGP key to someone, and how to verify that PGP key.
 
@@ -176,7 +176,7 @@ Here the fingerprint is on the second line, the groupings of 4 characters made u
 
 \pagebreak
 
-# Receiving keys! {#section5}
+# Receiving keys {#section5}
 
 ## 1. Importing a key {#section5-1}
 
@@ -202,9 +202,9 @@ At this stage in the process of receiving a key, you would fingerprint the key y
 
 In _[Figure 6](#f6)_ we can see that on the third line, there is [unknown] in brackets. This represents how much you have configured GPG to trust this key. By default, GPG will configure the trust level of a recently imported key to '[unknown]'. There are different trust levels that you can assign a key within GPG. These trust levels do not affect the key itself, only other keys that are signed by that key/keypair. The trust levels and what they do are in _[Table 1](#t1)_
 
-Trust Level | Description
---- | ---
-Ultimate | The Ultimate trust level is only intended to be used with __your own keys__
+Trust Level | Description                                               |
+- | ----
+Ultimate | The Ultimate trust level is only intended to be used with __your own keys__ 
 Full | This trust level is for keys you trust to __sign other keys__. I.E. if you import a key from Bob and trust if 'Fully', then if you receive a key from Alice that is signed by Bob's key, you can technically skip fingerprint verification because Alice's key has been cryptographically signed by Bob's 'Fully' trusted key.
 Marginal | This will make any key you receive valid as long as it has been signed by three other keys. This is a fairly complex trust level that most recommend avoiding.
 Unknown / Undefined | Technically both of these trust levels are the same, Unknown is set by GPG when importing a key, Undefined is set by a user usually to represent that they will come back to verify/ change it's trust level later.
@@ -228,3 +228,9 @@ To trust this key you have selected to edit, type ```trust```. You will then be 
 ![Trust Menu for a key in GPG](src/img/trustMenuGPG.png){#f8}
 
 From here you choose the level of trust you wish to grant this key, then type ```quit```. You will then be put back to your regular command line.
+
+\pagebreak
+
+# Sending Messages {#section6}
+
+When sending people messages with your new
