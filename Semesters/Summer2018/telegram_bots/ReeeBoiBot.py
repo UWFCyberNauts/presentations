@@ -31,7 +31,7 @@ def processJsonForOffset(result_array):
     return update_id
 
 def processJsonForMessage(result_array):
-    messages = list()
+    messages = []
     for update in result_array:
         message = update['message'] # I will always get these
         caught = False
@@ -47,9 +47,9 @@ def processJsonForMessage(result_array):
                     messages.append((message['caption'], message['date']))
                 except KeyError:
                     verboseSay("Not even a picture!")
-                    return None
+                    continue
 
-        return messages
+    return messages
 
 headers = {'Content-type': 'application/json'}
 botExt = "/bot"
@@ -123,6 +123,7 @@ while True:
     verboseSay(f"Offset: {offset}")
 
     if messages is not None: 
+        verboseSay(f"# of messages: {len(messages)}")
         unix_time = int(datetime.now().timestamp())
         verboseSay(f"Unix_Time: {unix_time}")
 
@@ -131,6 +132,8 @@ while True:
                 verboseSay("Matched REEE")
 
                 reee_count += 1
+                verboseSay(f"REEE Count: {reee_count}")
+
                 if file_logging:
                     reee_file.seek(0)
                     reee_file.truncate()
@@ -140,7 +143,7 @@ while True:
                 if (unix_time - timestamp) < 60 and (unix_time - timestamp) > -60:
                     verboseSay("Send REEE COUNT")
 
-                    sendMessageJson = dumps({'chat_id': channelToListenID, 'text': f'Reee count: {reee_count}'})
+                    sendMessageJson = dumps({'chat_id': channelToListenID, 'text': f'REEE count: {reee_count}'})
 
                     verboseSay(f"Calling POST: {botExt + sendMessage}")
                     tAPIConnection.request("POST", botExt + sendMessage, sendMessageJson, headers)
