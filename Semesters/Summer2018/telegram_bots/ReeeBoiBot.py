@@ -4,60 +4,49 @@ from http.client import HTTPSConnection
 from json import dumps, loads
 from sys import argv, exit
 from datetime import datetime
-import re
+from os.path import exists
+from os import stat
+import re # How fitting ^o^
 
-def processJsonForChatID(json, channel):
-    jsonResult = json['result']
-    if len(jsonResult) < 1:
-        print("No message!")
-        return None
+def verboseSay(string):
+    if verbose:
+        print(string)
 
-    else:
-        chat_id = 0
+def processJsonForChatID(result_array, channel):
+    chat_id = 0
 
-        for update in jsonResult:
-            chat = (update['message'])['chat']
-            print(chat['title'])
-            if chat['title'] == channel:
-                chat_id = chat['id'] # I will always get these
-                return chat_id
+    for update in result_array:
+        chat = (update['message'])['chat']
+        verboseSay(chat['title'])
+        if chat['title'] == channel:
+            chat_id = chat['id'] # I will always get these
+            return chat_id
 
-def processJsonForOffset(json):
-    jsonResult = json['result']
-    if len(jsonResult) < 1:
-        print("No message!")
-        return None
+def processJsonForOffset(result_array):
+    update_id = 0
 
-    else:
-        update_id = 0
+    for update in result_array:
+        update_id = update['update_id'] # I will always get these
 
-        for update in jsonResult:
-            update_id = update['update_id'] # I will always get these
+    return update_id
 
-        return update_id
+def processJsonForMessage(result_array):
+    messages = list()
+    for update in result_array:
+        message = update['message'] # I will always get these
+        caught = False
 
-def processJsonForMessage(json):
-    jsonResult = json['result']
-    if len(jsonResult) < 1:
-        print("No message!")
-        return None
-    else:
-        messages = list()
-        for update in jsonResult:
-            message = update['message'] # I will always get these
-            caught = False
-
-            try:
-                messages.append((message['text'], message['date'])) # I may not get this
-            except KeyError:
-                caught = True
-                print("Got a key error")
+        try:
+            messages.append((message['text'], message['date'])) # I may not get this
+        except KeyError:
+            caught = True
+            verboseSay("Got a key error")
 
             if caught:
                 try:
                     messages.append((message['caption'], message['date']))
                 except KeyError:
-                    print("Not even a picture!")
+                    verboseSay("Not even a picture!")
                     return None
 
         return messages
@@ -67,61 +56,98 @@ botExt = "/bot"
 getMe = "/getMe"
 getUpdates = "/getUpdates"
 sendMessage = "/sendMessage"
-channelToListen = "ReeeBoiTesting"
+channelToListen = None
 channelToListenID = None
+verbose = False
+file_logging = False
+reee_file = None
 regular_expression = re.compile(r"reee", re.IGNORECASE)
 reee_count = 0
 offset = 0
 
-if len(argv) == 3 and argv[1] == '-a' and len(argv[2]) == 45:
-    botExt += argv[2]
-else:
-    print(f"Usage: {argv[0]} -a API_KEY")
-    exit(1)
+if len(argv) > 1:
+    count = 0
+    for arg in argv:
+        count += 1
+        if count <= len(argv):
+            if arg == '-a':
+                botExt += argv[count]
+            elif arg == '-v':
+                verbose = True
+            elif arg == '-f':
+                file_logging = True
+                if exists(argv[count]):
+                    if stat(argv[count]).st_size > 0:
+                        reee_file = open(argv[count], 'r')
+                        reee_count = int(reee_file.readline().rstrip())
 
+                reee_file = open(argv[count], 'w')
+            elif arg == '-c':
+                channelToListen = argv[count]
+        else:
+            print(f"Usage: {argv[0]} [-v{{erbose}}] -a API_KEY -c CHANNEL_TO_LISTEN_TO -f COUNT_FILE\n\t\tWhere COUNT_FILE is the file that stores the REEE count\n\t\twhere CHANNEL_TO_LISTEN_TO is the channel that the bot will pay attention to")
+            exit(1)
+
+if not channelToListen:
+    print(f"Usage: {argv[0]} [-v{{erbose}}] -a API_KEY -c CHANNEL_TO_LISTEN_TO -f COUNT_FILE\n\t\tWhere COUNT_FILE is the file that stores the REEE count\n\t\twhere CHANNEL_TO_LISTEN_TO is the channel that the bot will pay attention to")
+    exit(1)
 
 tAPIConnection = HTTPSConnection("api.telegram.org", 443)
 
 while True:
     getUpdatesJson = dumps({'offset': offset, 'limit': 100, 'timeout': 30, 'allowed_updates': ['message']})
 
-    print(f"Calling POST: {botExt + getUpdates}")
+    verboseSay(f"Calling POST: {botExt + getUpdates}")
+
     tAPIConnection.request("POST", botExt + getUpdates, getUpdatesJson, headers)
     response = tAPIConnection.getresponse()
 
-    print(f"Got: {response.status}, {response.reason}")
-    data = loads(response.read().decode("UTF-8"))
+    verboseSay(f"Got: {response.status}, {response.reason}")
 
-    print(dumps(data, sort_keys=True, indent=4))
-    messages = processJsonForMessage(data)
-    update = processJsonForOffset(data)
+    data = loads(response.read().decode("UTF-8"))
+    verboseSay(dumps(data, sort_keys=True, indent=4))
+
+    results = data['result']
+
+    if len(results) < 1:
+        verboseSay("No message!")
+        continue
+
+    messages = processJsonForMessage(results)
+    offset = processJsonForOffset(results) + 1
 
     if channelToListenID is None:
-        channelToListenID = processJsonForChatID(data, channelToListen)
-        print(f"Channel ID: {channelToListenID}")
+        channelToListenID = processJsonForChatID(results, channelToListen)
+        verboseSay(f"Channel ID: {channelToListenID}")
 
-    if update is not None:
-        offset = update + 1
-
-    print(f"Offset: {offset}")
+    verboseSay(f"Offset: {offset}")
 
     if messages is not None: 
         unix_time = int(datetime.now().timestamp())
-        print(f"Unix_Time: {unix_time}")
+        verboseSay(f"Unix_Time: {unix_time}")
 
         for message, timestamp in messages:
             if re.search(regular_expression, message):
-                print("Matched REEE")
+                verboseSay("Matched REEE")
+
                 reee_count += 1
+                if file_logging:
+                    reee_file.seek(0)
+                    reee_file.truncate()
+                    reee_file.write(str(reee_count))
+                    reee_file.flush()
 
                 if (unix_time - timestamp) < 60 and (unix_time - timestamp) > -60:
-                    print("Send REEE COUNT")
+                    verboseSay("Send REEE COUNT")
+
                     sendMessageJson = dumps({'chat_id': channelToListenID, 'text': f'Reee count: {reee_count}'})
+
+                    verboseSay(f"Calling POST: {botExt + sendMessage}")
                     tAPIConnection.request("POST", botExt + sendMessage, sendMessageJson, headers)
                     response = tAPIConnection.getresponse()
-                    print(dumps(loads(response.read().decode("UTF-8")), sort_keys=True, indent=4))
-                    print(f"After Speaking Got: {response.status}, {response.reason}")
+                    verboseSay(f"After Speaking Got: {response.status}, {response.reason}")
+                    verboseSay(dumps(loads(response.read().decode("UTF-8")), sort_keys=True, indent=4))
 
             else:
-                print("Not a REEE match!")
+                verboseSay("Not a REEE match!")
             
