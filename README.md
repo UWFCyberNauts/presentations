@@ -1,8 +1,11 @@
-### This repository holds the presentations for the Cyber Security Club
+# UWF CyberNauts Presentations
+
+This repository holds the presentations and code examples for the Cyber Security Club
 
 #### The format for this repository is:
+
 Presentations are stored in their own subdirectories within their proper semesters. 
-There is no guarentee that the contents of each presentations directory contatains the same file types, etc.
+Many of these presentations are made by different people. Do not expect the format for each presentation to be the same.
 The naming convention for the presentation directories is
 [snake case](https://en.wikipedia.org/wiki/Snake_case)
 
