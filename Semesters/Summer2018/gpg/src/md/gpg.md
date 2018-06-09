@@ -200,7 +200,7 @@ At this stage in the process of receiving a key, you would fingerprint the key y
 
 ## 2. Trusting keys {#section5-2}
 
-In _[Figure 6](#f6)_ we can see that on the third line, there is [unknown] in brackets. This represents how much you have configured GPG to trust this key. By default, GPG will configure the trust level of a recently imported key to '[unknown]'. There are different trust levels that you can assign a key within GPG. These trust levels do not affect the key itself, only other keys that are signed by that key/keypair. The trust levels and what they do are in _[Table 1](#t1)_
+In _[Figure 6](#f6)_ we can see that on the third line, there is [unknown] in brackets. This represents how much you have configured GPG to trust this key. By default, GPG will configure the trust level of a recently imported key to '[unknown]'. There are different trust levels that you can assign a key within GPG. These trust levels do not affect the key itself, only other keys that are signed by that key/keypair. The trust levels and what they do are in Table 1 below.
 
 Trust Level | Description                                               |
 - | ----
@@ -233,4 +233,51 @@ From here you choose the level of trust you wish to grant this key, then type ``
 
 # Sending Messages {#section6}
 
-When sending people messages with your new
+Sending people stuff using gpg is as simple as _[Example 9](#e9)_
+
+``` { #e9 .bash .numberLines startFrom="1" }
+$: gpg -a \
+       -o encrypted_file.ext.gpg.asc \
+       -r friends_email@domain.com \
+       -e unencrypted_file.ext
+```
+
+I'm doing something kidnof weird in _[Example 9](#e9)_. I have a whole bunch of `\` everywhere. These are escaping the newline characters (created by pressing the enter key) that follow them so the terminal doesn't send an 'execute' signal (what normally happens when you hit enter when typing a command). This allows me to make a command extend multiple lines to make it look pretty for you.
+
+When I finally want to execute, I simply leave off the `\` and press enter like normal.
+
+The command I demo'd in _[Example 9](#e9)_ will result in the file `unencrypted_file.ext` being written encrypted to `encrypted_file.ext.gpg.asc`. To be more specific, the `-o` flag writes the ciphertext to the filename following the flag. The `-a` flag writes the ciphertext in a human readable format. The `-e` flag tells GPG to encrypt the file following the flag. The `-r` flag designates the recipients for the message. GPG uses the recipient flag information to select public keys and encrypt the message with those public keys. In _[Example 9](#e9)_, only the recipient who has the private key for `friends_email@domain.com` will be able to decrypt this message. Not even the person who created the ciphertext could reverse it, unless they add their public key's unique identifier to the -r flag like in _[Example 10](#e10)_
+
+``` { #e10 .bash .numberLines startFrom="1" }
+$: gpg -a \
+       -o encrypted_file.ext.gpg.asc \
+       -r friends_email@domain.com \
+       -r message_senders_email@domain.com \
+       -e unencrypted_file.ext
+```
+
+There are many ways to send messages with GPG. I have showed you one. If you would like to see some of the more unique/ case specific methods, _[look them up](https://duckduckgo.com)_!
+
+\pagebreak
+
+# Receiving Messages {#section7}
+
+Now that I have demonstrated how to _[send messages](#section6)_ I will demonstrate how to decrypt messages you receive.
+
+``` { #e11 .bash .numberLines startFrom="1" }
+$: gpg -d encrypted_message.ext.gpg.asc
+```
+
+Executing the command in _[Example 11](#e11)_ will write the decrypted form of  
+  `encrypted_message.ext.gpg.asc` strait to the terminal. Naturally, you can use the same flag for writing GPG output to a file I demonstrated in _[Example 9](#e9)_ and _[Example 10](#e10)_.
+
+With as big of a swiss army tool GPG is, there are of course multiple other ways to 
+decrypt files. I have highlighted the method that you can use to get started with GPG. If you wish to see other methods, _[look them up](https://duckduckgo.com)_!
+
+\pagebreak
+
+# That's all Folks! {#section8}
+
+I've covered in detail some pretty fundamental aspects of GPG. There are some things I didn't cover, such as generating revocation certificates and integrating your PGP key with other services such as github. These things are out of the scope of this document. They're still worth a looks so.... _[look them up](https://duckduckgo.com)_! :D
+
+Thanks for reading!
