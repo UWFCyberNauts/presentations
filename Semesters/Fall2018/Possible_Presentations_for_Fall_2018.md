@@ -39,20 +39,6 @@
     * How to use PGP with things like git
     * Whats the purpose of using Asymetric Cryptography?
 
-2. Recon-Nauts! - Michael
-    
-    This will be a lab covering reconaissance in networks to better prepare students for Ethical hacking and Cyber Wargaming
-    in addition to CTF's that the club will compete in.
-
-    I will cover:
-    
-    * Non-obtrusive recon
-    * Why you should be logging what your doing
-    * Logging what your doing
-    * How to not get information you already got.
-    * What's loud and what's quiet?
-
-
 ## CTFs:
 
 
